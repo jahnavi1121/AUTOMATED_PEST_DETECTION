@@ -1,0 +1,179 @@
+/* General Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #000428, #004e92);
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+/* Floating Radiant Text */
+.background-text {
+    position: absolute;
+    top: 10%;
+    font-size: 6rem;
+    font-weight: bold;
+    color: transparent;
+    background-image: linear-gradient(45deg, #ff0000, #ff7300, #ffeb00, #00ff00, #00eaff, #1500ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: floatText 6s infinite alternate ease-in-out;
+    opacity: 0.2;
+    z-index: -1;
+}
+
+/* Floating Animation */
+@keyframes floatText {
+    0% { transform: translateY(-10px); }
+    100% { transform: translateY(10px); }
+}
+
+/* Container */
+.container {
+    width: 80%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Upload Section */
+.upload-section {
+    margin: 20px 0;
+}
+
+/* Upload Button */
+.upload-label, .capture-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #0dbde9, #3760f5);
+    color: white;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin: 10px;
+}
+
+.upload-label:hover, .capture-btn:hover {
+    background: linear-gradient(90deg, #ff9966, #ff5e62);
+    transform: scale(1.05);
+}
+
+/* Capture Button */
+.capture-btn {
+    background: linear-gradient(90deg, #36d1dc, #5b86e5);
+}
+
+.capture-btn:hover {
+    background: linear-gradient(90deg, #5b86e5, #36d1dc);
+}
+
+/* Analyze Button */
+.analyze-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #36d1dc, #5b86e5);
+    color: white;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.analyze-btn:hover {
+    background: linear-gradient(90deg, #5b86e5, #36d1dc);
+    transform: scale(1.1);
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top: 5px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Result Box */
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.5s ease-in-out;
+}
+
+.result-box.show {
+    transform: scale(1);
+}
+
+/* Error Message */
+.error-message {
+    color: #ff4f4f;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Image Preview */
+#imagePreviewContainer {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#imagePreview {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+#imagePreview:hover {
+    transform: scale(1.05);
+}
+
+/* Go Back Button */
+.go-back-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #ff8c00, #ff3b3b);
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.go-back-btn:hover {
+    background: linear-gradient(90deg, #ff3b3b, #ff8c00);
+    transform: scale(1.1);
+}
+
+/* Hidden Class */
+.hidden {
+    display: none;
+}

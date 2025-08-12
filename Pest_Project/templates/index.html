@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pest Control Advisor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-text">Bug Busters</div>
+
+    <div class="container">
+        <h1>🌱 AI Pest Control Advisor</h1>
+
+        <div class="upload-section">
+            <input type="file" id="pestImage" accept="image/*" hidden onchange="previewImage(event)">
+            <label for="pestImage" class="upload-label">
+                <span>📁 Upload Pest Image</span>
+            </label>
+            
+            <button class="camera-btn" onclick="openCamera()">📷 Capture Image</button>
+
+            <!-- Live Camera & Capture Section -->
+            <div id="cameraContainer" class="hidden">
+                <video id="video" autoplay></video>
+                <button id="captureBtn">📸 Capture</button>
+            </div>
+
+            <!-- Image Preview Section -->
+            <div id="imagePreviewContainer" class="hidden">
+                <img id="imagePreview" src="" alt="Uploaded Image">
+            </div>
+
+            <button class="analyze-btn hidden" id="analyzeBtn" onclick="analyzePest()">🔍 Analyze</button>
+        </div>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            Analyzing...
+        </div>
+
+        <div id="resultSection" class="hidden result-box">
+            <h2>Analysis Results</h2>
+            <div id="pestDetails">
+                <p><strong>Detected Pest:</strong> <span id="pestName"></span></p>
+                <p><strong>Confidence:</strong> <span id="pestConfidence"></span></p>
+            </div>
+            <div id="recommendations"></div>
+
+            <button class="go-back-btn" onclick="goBack()">⬅️ Go Back</button>
+        </div>
+
+        <div id="error" class="hidden error-message"></div>
+    </div>
+
+    <script>
+    let cameraStream;
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        if (file) {
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                document.getElementById('analyzeBtn').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function openCamera() {
+        const cameraContainer = document.getElementById("cameraContainer");
+        const video = document.getElementById("video");
+        const captureBtn = document.getElementById("captureBtn");
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                cameraStream = stream;
+                video.srcObject = stream;
+                cameraContainer.classList.remove("hidden");
+            })
+            .catch(error => {
+                showError("Camera access denied or unavailable.");
+                console.error(error);
+            });
+
+        captureBtn.onclick = function() {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            document.getElementById("imagePreview").src = canvas.toDataURL("image/png");
+            document.getElementById("imagePreviewContainer").classList.remove("hidden");
+            document.getElementById("analyzeBtn").classList.remove("hidden");
+            cameraContainer.classList.add("hidden");
+
+            // Stop the camera after capturing
+            cameraStream.getTracks().forEach(track => track.stop());
+        };
+    }
+
+    async function analyzePest() {
+        const fileInput = document.getElementById('pestImage');
+        const loading = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const resultSection = document.getElementById('resultSection');
+
+        if (!fileInput.files[0] && document.getElementById("imagePreview").src === "") {
+            showError("Please select or capture an image first!");
+            return;
+        }
+
+        clearResults();
+        loading.classList.remove('hidden');
+        errorDiv.classList.add('hidden');
+
+        try {
+            const formData = new FormData();
+            if (fileInput.files[0]) {
+                formData.append('file', fileInput.files[0]);
+            } else {
+                // Convert captured image to Blob
+                const imageBlob = await fetch(document.getElementById("imagePreview").src).then(res => res.blob());
+                formData.append('file', imageBlob, 'captured_image.png');
+            }
+
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                showError(data.error);
+                return;
+            }
+
+            document.getElementById('pestName').textContent = data.pest;
+            document.getElementById('pestConfidence').textContent = data.confidence;
+            document.getElementById('recommendations').innerHTML = data.recommendations;
+            resultSection.classList.remove('hidden');
+            
+        } catch (error) {
+            showError("Analysis failed. Please try again.");
+        } finally {
+            loading.classList.add('hidden');
+        }
+    }
+
+    function goBack() {
+        document.getElementById('resultSection').classList.add('hidden');
+        document.getElementById('imagePreviewContainer').classList.add('hidden');
+        document.getElementById('analyzeBtn').classList.add('hidden');
+        document.getElementById('pestImage').value = ""; // Reset file input
+    }
+
+    function clearResults() {
+        document.getElementById('pestName').textContent = '';
+        document.getElementById('pestConfidence').textContent = '';
+        document.getElementById('recommendations').innerHTML = '';
+    }
+
+    function showError(message) {
+        const errorDiv = document.getElementById('error');
+        errorDiv.innerHTML = `❌ ${message}`;
+        errorDiv.classList.remove('hidden');
+    }
+    </script>
+
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+    }
+    .container {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #ff5e62, #ff9966);
+    color: white;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin: 10px;;
+    }
+    .hidden {
+        display: none;
+    }
+    .camera-btn{
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #0dbde9, #3760f5);
+    color: white;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin: 10px;
+    }
+    video {
+        width: 100%;
+        border-radius: 8px;
+    }
+    </style>
+</body>
+</html>
